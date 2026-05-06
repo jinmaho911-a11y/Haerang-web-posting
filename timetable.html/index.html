@@ -5,47 +5,55 @@
     <title>시간표</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: Arial;
             text-align: center;
-        }
-
-        h1 {
-            margin-top: 20px;
+            background: #f5f5f5;
         }
 
         table {
             margin: 20px auto;
             border-collapse: collapse;
             width: 90%;
-            background-color: white;
+            background: white;
         }
 
         th, td {
             border: 1px solid #333;
             padding: 10px;
-            text-align: center;
         }
 
         th {
-            background-color: #4CAF50;
+            background: #4CAF50;
             color: white;
         }
 
         .time {
-            background-color: #ddd;
-            font-weight: bold;
+            background: #ddd;
         }
 
         .lunch {
-            background-color: #ffcc80;
-            font-weight: bold;
+            background: #ffcc80;
+        }
+
+        /* 흐리게 */
+        .hide {
+            opacity: 0.2;
         }
     </style>
 </head>
 <body>
 
 <h1>학교 시간표</h1>
+
+<select id="subject" onchange="filterSubject()">
+    <option value="all">전체보기</option>
+    <option value="국어">국어</option>
+    <option value="수학">수학</option>
+    <option value="영어">영어</option>
+    <option value="과학">과학</option>
+    <option value="사회">사회</option>
+    <option value="체육">체육</option>
+</select>
 
 <table>
     <tr>
@@ -58,74 +66,62 @@
     </tr>
 
     <tr>
-        <td class="time">1교시<br>09:00 ~ 09:50</td>
-        <td>국어</td>
-        <td>수학</td>
-        <td>영어</td>
-        <td>과학</td>
-        <td>사회</td>
+        <td class="time">1교시</td>
+        <td>국어</td><td>수학</td><td>영어</td><td>과학</td><td>사회</td>
+    </tr>
+    <tr>
+        <td class="time">2교시</td>
+        <td>수학</td><td>국어</td><td>과학</td><td>영어</td><td>체육</td>
+    </tr>
+    <tr>
+        <td class="time">3교시</td>
+        <td>영어</td><td>사회</td><td>국어</td><td>수학</td><td>체육</td>
+    </tr>
+    <tr>
+        <td class="time">4교시</td>
+        <td>과학</td><td>영어</td><td>수학</td><td>국어</td><td>사회</td>
     </tr>
 
     <tr>
-        <td class="time">2교시<br>10:00 ~ 10:50</td>
-        <td>수학</td>
-        <td>국어</td>
-        <td>과학</td>
-        <td>영어</td>
-        <td>체육</td>
+        <td class="lunch">점심</td>
+        <td colspan="5" class="lunch">점심시간</td>
     </tr>
 
     <tr>
-        <td class="time">3교시<br>11:00 ~ 11:50</td>
-        <td>영어</td>
-        <td>사회</td>
-        <td>국어</td>
-        <td>수학</td>
-        <td>음악</td>
+        <td class="time">5교시</td>
+        <td>사회</td><td>과학</td><td>체육</td><td>음악</td><td>국어</td>
     </tr>
-
     <tr>
-        <td class="time">4교시<br>12:00 ~ 12:50</td>
-        <td>과학</td>
-        <td>영어</td>
-        <td>수학</td>
-        <td>국어</td>
-        <td>미술</td>
+        <td class="time">6교시</td>
+        <td>체육</td><td>미술</td><td>사회</td><td>과학</td><td>수학</td>
     </tr>
-
     <tr>
-        <td class="time lunch">점심시간<br>12:50 ~ 13:50</td>
-        <td class="lunch" colspan="5">점심시간</td>
-    </tr>
-
-    <tr>
-        <td class="time">5교시<br>13:50 ~ 14:40</td>
-        <td>사회</td>
-        <td>과학</td>
-        <td>체육</td>
-        <td>음악</td>
-        <td>국어</td>
-    </tr>
-
-    <tr>
-        <td class="time">6교시<br>14:50 ~ 15:40</td>
-        <td>체육</td>
-        <td>미술</td>
-        <td>사회</td>
-        <td>과학</td>
-        <td>수학</td>
-    </tr>
-
-    <tr>
-        <td class="time">7교시<br>15:50 ~ 16:40</td>
-        <td>자율</td>
-        <td>동아리</td>
-        <td>자습</td>
-        <td>체육</td>
-        <td>자습</td>
+        <td class="time">7교시</td>
+        <td>자습</td><td>동아리</td><td>자습</td><td>체육</td><td>자습</td>
     </tr>
 
 </table>
+
+<script>
+function filterSubject() {
+    let selected = document.getElementById("subject").value;
+    let cells = document.querySelectorAll("td");
+
+    cells.forEach(td => {
+        if (td.classList.contains("time") || td.classList.contains("lunch")) return;
+
+        if (selected === "all") {
+            td.classList.remove("hide");
+        } else {
+            if (td.textContent === selected) {
+                td.classList.remove("hide");
+            } else {
+                td.classList.add("hide");
+            }
+        }
+    });
+}
+</script>
 
 </body>
 </html>
