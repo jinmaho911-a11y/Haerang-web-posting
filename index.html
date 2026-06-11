@@ -73,17 +73,18 @@
         const todayString = `${year}${month}${date}`;
         document.querySelector('#data-display').textContent = `${month}월 ${date}일`;
 
-        // NEIS 급식 데이터 가져오기
+        // [3] NEIS 급식 데이터 가져오기 (오류 수정 완료)
         const getTodayMeal = async () => {
             const myApikey = "fd48b2b5ac5a46c08b6d0854f60ae62b";
             const officeCode = "J10";
             const schoolCode = "7530591";
-            const url = `https://neis.go.kr{myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
+            const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
 
+                // 데이터 파싱 경로 에러 수정 ([1].row[0] 누락 보완)
                 if (data.mealServiceDietInfo) {
                     const mealRow = data.mealServiceDietInfo[1].row[0];
                     const cleanMenu = mealRow.DDISH_NM.replace(/<br\/>/g, '\n');
