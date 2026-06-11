@@ -7,11 +7,31 @@
     
     <!-- CSS 스타일 태그 -->
     <style>
+        /* [시계 스타일] 화면 상단 중앙 배치 */
+        .clock-container {
+            border: 2px solid #333;
+            padding: 15px;
+            width: 300px;
+            background-color: #f9f9f9;
+            margin: 20px auto; 
+            text-align: center;
+        }
+        .clock-title {
+            margin: 0;
+            color: #555;
+        }
+        #digital-clock {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+            font-family: monospace;
+        }
+
         /* [급식 상자 스타일] 오른쪽 아래 구석에 작게 고정 */
         #fixed-meal-container {
             position: fixed;
             bottom: 20px;
-            right: 20px;
+            right: 20px; /* 👈 left에서 right로 변경하여 오른쪽 구석으로 배치 */
             width: 220px;
             background-color: rgba(255, 255, 255, 0.95);
             border-left: 5px solid #28a745;
@@ -53,6 +73,12 @@
 </head>
 <body>
 
+    <!-- 현재 시간 시계 영역 -->
+    <div class="clock-container">
+        <h3 class="clock-title">현재 시간</h3>
+        <div id="digital-clock">00:00:00</div>
+    </div>
+
     <!-- 🍱 오른쪽 아래 구석에 고정되는 급식 위젯 영역 -->
     <div id="fixed-meal-container">
         <h4>오늘의 급식 🍱</h4>
@@ -60,9 +86,25 @@
         <div id="meal-box">급식을 불러오는 중...</div>
     </div>
 
-    <!-- 기능 스크립트 (급식 API 전용) -->
+    <!-- 기능 스크립트 (시계 + 급식 API) -->
     <script>
-        // 오늘 날짜 구하기
+        // [1] 실시간 시계 기능
+        const updateClock = () => {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+
+            if (hours < 10) hours = '0' + hours;
+            if (minutes < 10) minutes = '0' + minutes;
+            if (seconds < 10) seconds = '0' + seconds;
+
+            document.querySelector('#digital-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // [2] 오늘 날짜 구하기
         const today = new Date();
         const year = today.getFullYear();
         let month = today.getMonth() + 1;
@@ -122,7 +164,7 @@
             <h2>웹개발자</h2>
             <img src="images/fropile.jpg" alt="프로필 이미지">
             <p>
-                안녕하세요? 저는 웹 개발자가 되고 싶은 고않학생입니다.
+                안녕하세요? 저는 웹 개발자가 되고 싶은 고등학생입니다.
                 새로운 기술을 배우는 것을 좋아하고 도전하는 것을 즐깁니다.
             </p>
             <ul>
