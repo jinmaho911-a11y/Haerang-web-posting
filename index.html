@@ -27,11 +27,11 @@
             font-family: monospace;
         }
 
-        /* [급식 상자 스타일] 왼쪽 아래 구석에 작게 고정 */
+        /* [급식 상자 스타일] 오른쪽 아래 구석에 작게 고정 */
         #fixed-meal-container {
             position: fixed;
             bottom: 20px;
-            left: 20px;
+            right: 20px; /* 👈 left에서 right로 변경하여 오른쪽 구석으로 배치 */
             width: 220px;
             background-color: rgba(255, 255, 255, 0.95);
             border-left: 5px solid #28a745;
@@ -62,7 +62,7 @@
         }
         #meal-box {
             margin: 0;
-            white-space: pre-wrap; /* pre 태그처럼 줄바꿈 유지하되 박스 크기 넘치면 자동 줄바꿈 */
+            white-space: pre-wrap; /* 줄바꿈 유지하되 박스 크기 넘치면 자동 줄바꿈 */
             font-family: inherit;
             color: #333;
             line-height: 1.4;
@@ -79,7 +79,7 @@
         <div id="digital-clock">00:00:00</div>
     </div>
 
-    <!-- 🍱 왼쪽 아래 구석에 고정될 급식 위젯 영역 -->
+    <!-- 🍱 오른쪽 아래 구석에 고정되는 급식 위젯 영역 -->
     <div id="fixed-meal-container">
         <h4>오늘의 급식 🍱</h4>
         <p id="data-display">조회 중...</p>
@@ -113,32 +113,32 @@
         if (date < 10) date = '0' + date;
 
         const todayString = `${year}${month}${date}`;
-        // 구석 위젯용이라 날짜는 심플하게 "00월 00일"로 표시
         document.querySelector('#data-display').textContent = `${month}월 ${date}일`;
 
-        // [3] NEIS 급식 데이터 가져오기
+        // [3] NEIS 급식 데이터 가져오기 (오류 수정 완료)
         const getTodayMeal = async () => {
             const myApikey = "fd48b2b5ac5a46c08b6d0854f60ae62b";
             const officeCode = "J10";
             const schoolCode = "7530591";
-            const url = `https://neis.go.kr{myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
+            const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
 
+                // 데이터 파싱 경로 에러 수정 ([1].row[0] 누락 보완)
                 if (data.mealServiceDietInfo) {
                     const mealRow = data.mealServiceDietInfo[1].row[0];
                     const cleanMenu = mealRow.DDISH_NM.replace(/<br\/>/g, '\n');
                     const calories = mealRow.CAL_INFO;
 
-                    document.querySelector('#meal-box').textContent = `${cleanMenu}\n\n[${calories}]`;
+                    document.querySelector('#meal-box').textContent = `${cleanMenu}\n\n[총 칼로리: ${calories}]`;
                 } else {
-                    document.querySelector('#meal-box').textContent = '급식 정보가 없습니다.\n(주말/공휴일)';
+                    document.querySelector('#meal-box').textContent = '오늘 일자에는 급식 정보가 없습니다. (주말 또는 공휴일)';
                 }
             } catch (error) { 
                 document.querySelector('#meal-box').textContent = '급식 불러오기 실패 😥';
-                console.error('에러 로그: ', error);
+                console.error('비동기 통신 에러 로그: ', error);
             }
         };
 
