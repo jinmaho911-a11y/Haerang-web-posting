@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>홍길순의 미니홈피</title>
+    <script>
+        // [1] 실시간 시계 기능
+        const updateClock = () => {
+            const now = new Date();
+            let hours = now.getHours();    // 공백 정리
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds(); // 오타 수정: new.getSeconds() -> now.getSeconds()
+
+            if (hours < 10) hours = '0' + hours;
+            if (minutes < 10) minutes = '0' + minutes;
+            if (seconds < 10) seconds = '0' + seconds;
+
+            document.querySelector('#digital-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        // 시계 타이머 실행
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
