@@ -41,7 +41,13 @@
         <h3 class="clock-title">현재 시간</h3>
         <div id="digital-clock">00:00:00</div>
     </div>
-    
+
+    <hr>
+
+    <h1>성일정보고등학교 오늘의 급식</h1>
+    <h3 id="data-display">조회 중...</h3>
+    <pre id="meal-box">급식을 실시간으로 불러오는 중입니다....</pre>
+
     <script>
         // [1] 실시간 시계 기능
         const updateClock = () => {
@@ -59,6 +65,55 @@
         // 시계 타이머 실행
         setInterval(updateClock, 1000);
         updateClock();
+
+        // [2] 오늘 날짜 파싱 기능
+        const today = new Date();
+        const year = today.getFullYear();
+
+        let month = today.getMonth() + 1;
+        if (month < 10) {
+            month = '0' + month;
+        }
+
+        let date = today.getDate();
+        if (date < 10) {
+            date = '0' + date;
+        }
+
+        const todayString = `${year}${month}${date}`;
+        document.querySelector('#data-display').textContent = `조회 날짜: ${year}년 ${month}월 ${date}일 (${todayString})`;
+
+        // [3] 급식 데이터 fetch 함수 (모든 통신 로직 및 변수를 async 블록 안으로 통합)
+        const getTodayMeal = async () => {
+            const myApikey = "fd48b2b5ac5a46c08b6d0854f60ae62b";
+            const officeCode = "J10";
+            const schoolCode = "7530591";
+            
+            // 템플릿 리터럴 내부 변수명 대소문자(myApikey) 수정 및 닫는 중괄호 보완
+            const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json(); // 변수명 오타 수정: date -> data
+
+                if (data.mealServiceDietInfo) {
+                    const mealRow = data.mealServiceDietInfo[1].row[0];
+                    const cleanMenu = mealRow.DDISH_NM.replace(/<br\/>/g, '\n');
+                    const calories = mealRow.CAL_INFO;
+
+                    document.querySelector('#meal-box').textContent = `${cleanMenu}\n\n[총 칼로리: ${calories}]`;
+                } else {
+                    document.querySelector('#meal-box').textContent = '오늘 일자에는 급식 정보가 없습니다. (주말 또는 공휴일)';
+                }
+            } catch (error) { 
+                document.querySelector('#meal-box').textContent = '서버 통신 실패! 인터넷 연결이나 코드를 다시 확인해주세요';
+                console.error('비동기 통신 에러 로그: ', error);
+            }
+        };
+
+        // DOM 로드가 완료되면 급식 함수 호출
+        document.addEventListener('DOMContentLoaded', getTodayMeal);
+    </script>
     
     <!-- 고정 메뉴 -->
     <header id="header">
