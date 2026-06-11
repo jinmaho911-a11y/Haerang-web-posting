@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>홍길순의 미니홈피</title>
     
-    <!-- CSS 스타일 태그 수정 (<script>에서 <style>로 변경) -->
+    <!-- CSS 스타일 태그 -->
     <style>
+        /* [시계 스타일] 화면 상단 중앙 배치 */
         .clock-container {
             border: 2px solid #333;
             padding: 15px;
             width: 300px;
             background-color: #f9f9f9;
-            margin: 20px auto; /* 중앙 정렬 */
+            margin: 20px auto; 
             text-align: center;
         }
         .clock-title {
@@ -25,20 +26,69 @@
             color: #007bff;
             font-family: monospace;
         }
+
+        /* [급식 상자 스타일] 왼쪽 아래 구석에 작게 고정 */
+        #fixed-meal-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 220px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-left: 5px solid #28a745;
+            border-top: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 9999;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        /* 마우스를 올리면 선명해짐 */
+        #fixed-meal-container:hover {
+            opacity: 1;
+        }
+        #fixed-meal-container h4 {
+            margin: 0 0 8px 0;
+            color: #28a745;
+            font-size: 0.9rem;
+        }
+        #fixed-meal-container p {
+            margin: 0 0 5px 0;
+            color: #666;
+            font-size: 0.75rem;
+        }
+        #meal-box {
+            margin: 0;
+            white-space: pre-wrap; /* pre 태그처럼 줄바꿈 유지하되 박스 크기 넘치면 자동 줄바꿈 */
+            font-family: inherit;
+            color: #333;
+            line-height: 1.4;
+        }
     </style>
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- [1] 현재 시간 시계 영역 -->
+    <!-- 현재 시간 시계 영역 -->
     <div class="clock-container">
         <h3 class="clock-title">현재 시간</h3>
         <div id="digital-clock">00:00:00</div>
     </div>
 
-    <!-- [2] 실시간 시계 자바스크립트 -->
+    <!-- 🍱 왼쪽 아래 구석에 고정될 급식 위젯 영역 -->
+    <div id="fixed-meal-container">
+        <h4>오늘의 급식 🍱</h4>
+        <p id="data-display">조회 중...</p>
+        <div id="meal-box">급식을 불러오는 중...</div>
+    </div>
+
+    <!-- 기능 스크립트 (시계 + 급식 API) -->
     <script>
+        // [1] 실시간 시계 기능
         const updateClock = () => {
             const now = new Date();
             let hours = now.getHours();
@@ -53,9 +103,50 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        // [2] 오늘 날짜 구하기
+        const today = new Date();
+        const year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        if (month < 10) month = '0' + month;
+        let date = today.getDate();
+        if (date < 10) date = '0' + date;
+
+        const todayString = `${year}${month}${date}`;
+        // 구석 위젯용이라 날짜는 심플하게 "00월 00일"로 표시
+        document.querySelector('#data-display').textContent = `${month}월 ${date}일`;
+
+        // [3] NEIS 급식 데이터 가져오기
+        const getTodayMeal = async () => {
+            const myApikey = "fd48b2b5ac5a46c08b6d0854f60ae62b";
+            const officeCode = "J10";
+            const schoolCode = "7530591";
+            const url = `https://neis.go.kr{myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.mealServiceDietInfo) {
+                    const mealRow = data.mealServiceDietInfo[1].row[0];
+                    const cleanMenu = mealRow.DDISH_NM.replace(/<br\/>/g, '\n');
+                    const calories = mealRow.CAL_INFO;
+
+                    document.querySelector('#meal-box').textContent = `${cleanMenu}\n\n[${calories}]`;
+                } else {
+                    document.querySelector('#meal-box').textContent = '급식 정보가 없습니다.\n(주말/공휴일)';
+                }
+            } catch (error) { 
+                document.querySelector('#meal-box').textContent = '급식 불러오기 실패 😥';
+                console.error('에러 로그: ', error);
+            }
+        };
+
+        // 화면 로드가 완료되면 급식 호출
+        document.addEventListener('DOMContentLoaded', getTodayMeal);
     </script>
 
-    <!-- [3] 고정 메뉴 -->
+    <!-- 고정 메뉴 -->
     <header id="header">
         <ul>
             <li><a href="#">HOME</a></li>
@@ -65,7 +156,7 @@
         </ul>
     </header>
 
-    <!-- [4] 메인 영역 (홍길순 미니홈피) -->
+    <!-- 메인 영역 (홍길순 미니홈피) -->
     <div id="container">
         <!-- 프로필 -->
         <div class="profile">
@@ -122,7 +213,7 @@
         </div>
     </div>
 
-    <!-- [5] 푸터 영역 -->
+    <!-- 푸터 영역 -->
     <footer id="footer">
         <address>&copy; 2026 성일정보고. All rights reserved.</address>
     </footer>
