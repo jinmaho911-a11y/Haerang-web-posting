@@ -7,13 +7,11 @@
     
     <!-- CSS 스타일 태그 -->
     <style>
-        
-
-
+        /* [급식 상자 스타일] 오른쪽 아래 구석에 작게 고정 */
         #fixed-meal-container {
             position: fixed;
             bottom: 20px;
-            right: 20px; 
+            right: 20px;
             width: 220px;
             background-color: rgba(255, 255, 255, 0.95);
             border-left: 5px solid #28a745;
@@ -28,7 +26,20 @@
             opacity: 0.8;
             transition: opacity 0.3s ease;
         }
-       
+        /* 마우스를 올리면 선명해짐 */
+        #fixed-meal-container:hover {
+            opacity: 1;
+        }
+        #fixed-meal-container h4 {
+            margin: 0 0 8px 0;
+            color: #28a745;
+            font-size: 0.9rem;
+        }
+        #fixed-meal-container p {
+            margin: 0 0 5px 0;
+            color: #666;
+            font-size: 0.75rem;
+        }
         #meal-box {
             margin: 0;
             white-space: pre-wrap; /* 줄바꿈 유지하되 박스 크기 넘치면 자동 줄바꿈 */
@@ -42,8 +53,15 @@
 </head>
 <body>
 
-   
+    <!-- 🍱 오른쪽 아래 구석에 고정되는 급식 위젯 영역 -->
+    <div id="fixed-meal-container">
+        <h4>오늘의 급식 🍱</h4>
+        <p id="data-display">조회 중...</p>
+        <div id="meal-box">급식을 불러오는 중...</div>
+    </div>
 
+    <!-- 기능 스크립트 (급식 API 전용) -->
+    <script>
         // 오늘 날짜 구하기
         const today = new Date();
         const year = today.getFullYear();
@@ -55,18 +73,17 @@
         const todayString = `${year}${month}${date}`;
         document.querySelector('#data-display').textContent = `${month}월 ${date}일`;
 
-        // [3] NEIS 급식 데이터 가져오기 (오류 수정 완료)
+        // NEIS 급식 데이터 가져오기
         const getTodayMeal = async () => {
             const myApikey = "fd48b2b5ac5a46c08b6d0854f60ae62b";
             const officeCode = "J10";
             const schoolCode = "7530591";
-            const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
+            const url = `https://neis.go.kr{myApikey}&Type=json&ATPT_OFCDC_SC_CODE=${officeCode}&SD_SCHUL_CODE=${schoolCode}&MLSV_YMD=${todayString}`;
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
 
-                // 데이터 파싱 경로 에러 수정 ([1].row[0] 누락 보완)
                 if (data.mealServiceDietInfo) {
                     const mealRow = data.mealServiceDietInfo[1].row[0];
                     const cleanMenu = mealRow.DDISH_NM.replace(/<br\/>/g, '\n');
@@ -104,7 +121,7 @@
             <h2>웹개발자</h2>
             <img src="images/fropile.jpg" alt="프로필 이미지">
             <p>
-                안녕하세요? 저는 웹 개발자가 되고 싶은 고등학생입니다.
+                안녕하세요? 저는 웹 개발자가 되고 싶은 고않학생입니다.
                 새로운 기술을 배우는 것을 좋아하고 도전하는 것을 즐깁니다.
             </p>
             <ul>
@@ -138,10 +155,6 @@
                     <tr>
                         <td><a href="timetable.html">나만의 시간표 ver1.0</a></td>
                         <td>2026-05-10</td>
-                    </tr>
-                    <tr>
-                        <td><a href="hood.html">학교급식 정보</a></td>
-                        <td>상시</td>
                     </tr>
                 </table>
             </div>
